@@ -1,41 +1,66 @@
 import React, { Component } from 'react';
-
 import logo from './logo.svg';
 import './App.css';
+import CardList from './CardList'; 
+
 
 class App extends Component {
   constructor() {
     super();
 
     this.state = {
-      name: {firstName:'Yihua', lastName: 'Zhang'},
-      company: 'ZTM',
+      monsters: [],
+      searchField: ''
     };
   }
 
+  
+  componentDidMount() {
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then((response) =>response.json())
+    .then((users) => 
+       this.setState(() => {
+        return {monsters: users };
+    })
+  );
+}
+  
+onSearchChange = (event) => {
+  const searchField = event.target.value.toLocaleLowerCase();
+  this.setState(() => {
+    return { searchField };
+ });
+}
+
   render() {
+
+    const { monsters, searchField } = this.state;
+    const { onSearchChange } = this;
+  
+    const filteredMonsters = this.state.monsters.filter((monster) => {
+      return  monster.name.toLocaleLowerCase().includes(searchField);
+     });
+
+
     return (
       <div className='App'>
-        <header className='App-header'>
-          <img src={logo} className='App-logo' alt='logo' /> {/* Fixed the image tag */}
-          <p>
-          Hi {this.state.firstname} {this.state.lastName} , I work 
-           at {this.state.company}
-          </p>
-          <button 
-           onClick={() => {
-              this.setState({
-                 name: {firstName:'Arcel', lastName: 'Derosena'}
-                 });
-              console.log(this.state);
-          }}
-        >
-          Change Name
-          </button> 
-        </header>
+      <input 
+      className='search-box' 
+      type='search'
+       placeholder='search monsters' 
+       onChange={onSearchChange}
+      />
+        {/* {filteredMonsters.map((monster) => {
+          return (
+            <div key={monster.id}>
+              <h1>{monster.name}</h1>
+            </div>
+          );
+        })} */}
+        <CardList monsters={'I am the monsters'} />
       </div>
     );
   }
-}
+}  
 
 export default App;
